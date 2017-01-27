@@ -44,6 +44,9 @@ class RelacionTablas extends Migration
         Schema::table('notificacion', function ($table) {        
         $table->foreign('materia')->references('id')->on('materiaCurso');
         $table->foreign('historial')->references('id')->on('historial');
+        $table->foreign('emisor')->references('id')->on('users');
+        $table->foreign('receptor')->references('id')->on('users');
+        $table->foreign('colegio')->references('id')->on('colegio');
         });
 
         Schema::table('notaBimestre', function ($table) {        

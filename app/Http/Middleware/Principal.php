@@ -27,7 +27,7 @@ class Principal
                 {
                     if (Entrust::hasRole('Administrador')) 
                     {
-                        return redirect('listarColegio');
+                        return redirect('userList');
                     }else
                     {
                         return redirect('logout');                        

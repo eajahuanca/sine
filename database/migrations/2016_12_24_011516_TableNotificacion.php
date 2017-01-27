@@ -14,13 +14,17 @@ public function up()
     {
         Schema::create('notificacion', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('tipo',250);
-            $table->string('motivo',250);
-            $table->text('descripcion');
-            $table->date('fecha');            
-            $table->integer('estado')->default(1);
+            $table->integer('emisor')->nullable()->unsigned();
+            $table->integer('receptor')->nullable()->unsigned();
+            $table->integer('colegio')->nullable()->unsigned();
+            $table->string('tipo');
+            $table->string('asunto');
+            $table->text('mensaje');            
             $table->integer('historial')->nullable()->unsigned();
             $table->integer('materia')->nullable()->unsigned();
+            $table->datetime('fechaEnvio')->nullable();
+            $table->datetime('fechaRecepcion')->nullable();
+            $table->integer('estado')->default(1);
             $table->softDeletes();
         });
     }

@@ -9,7 +9,19 @@ Route::group(['middleware' => 'auth'], function()
 {	
 	Route::get('/',['middleware' => 'principal','uses'=>'PrincipalController@principal']);
 	//RUTAS PARA LAS VISTAS DE ADMIN DIRECTOR ESTUDIANTE Y DOCENTE
+	//DIRECTOR
 	Route::get('director', 'PrincipalController@director');
+	Route::get('sendsmsDocente', 'PrincipalController@sendsmsDocente');
+	Route::post('sendsmsDocente', 'PrincipalController@enviarsmsDocente');
+	Route::get('smsenviados', 'PrincipalController@smsenviados');
+	Route::get('versms/{idsms}', 'PrincipalController@versms');
+
+	//Docente
+	Route::get('leersms/{idsms}', 'PrincipalController@leersms');
+	Route::get('allsms', 'PrincipalController@allsms');
+
+
+
 	Route::get('docente', 'PrincipalController@docente');
 	Route::get('pestudiante', 'PrincipalController@pestudiante');
 

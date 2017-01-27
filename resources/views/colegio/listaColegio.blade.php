@@ -16,9 +16,8 @@
 
 <div class="row">
 <div class="col-md-12">
-    
-@foreach ($colegio as $item)      
-    <div class="col-md-5 col-sm-6 col-xs-12">
+@foreach ($colegio as $item)
+    <div class="col-md-5">
           <div class="box box-widget widget-user">
             <!-- Add the bg color to the header using any of the bg-* classes -->
             <div class="widget-user-header bg-yellow" >
@@ -58,9 +57,8 @@
               <!-- /.row -->
             </div>
           </div>      
-</div>
+      </div>
 @endforeach
-
 </div>{{-- END COL --}}
   
 </div>{{-- END ROW --}}

@@ -39,7 +39,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'America/La_Paz',
 
     /*
     |--------------------------------------------------------------------------
@@ -196,6 +196,7 @@ return [
         'View'      => Illuminate\Support\Facades\View::class,
         'Excel'     => Maatwebsite\Excel\Facades\Excel::class,
         'Entrust'   => Zizaco\Entrust\EntrustFacade::class,
+        'Carbon'    => Carbon\Carbon::class,
 
     ],
 

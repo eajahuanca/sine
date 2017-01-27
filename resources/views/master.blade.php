@@ -35,6 +35,9 @@
   <link rel="stylesheet" href="{{ URL::asset('css/skins/_all-skins.min.css') }}">
   {{-- Animate --}}
   <link rel="stylesheet" href="{{ URL::asset('css/animate.css')}}" />
+  <link rel="stylesheet" href="{{ URL::asset('plugins/iCheck/flat/blue.css') }}">
+  <!-- bootstrap wysihtml5 - text editor -->
+  <link rel="stylesheet" href="{{ URL::asset('plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css') }}">
 
 
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -68,35 +71,42 @@
 
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
+        @if (Entrust::hasRole('Docente'))        
           <!-- Messages: style can be found in dropdown.less-->
           <li class="dropdown messages-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
               <i class="fa fa-envelope-o"></i>
-              <span class="label label-success">4</span>
+              <span class="label label-success">{{ $numeroSms or 0 }}</span>
             </a>
             <ul class="dropdown-menu">
-              <li class="header">You have 4 messages</li>
+              <li class="header">Notificaciónes de dirección</li>
               <li>
                 <!-- inner menu: contains the actual data -->
                 <ul class="menu">
+                
+                @if (isset($notificacion))                  
+                @foreach ($notificacion as $item)                  
                   <li><!-- start message -->
-                    <a href="#">
+                    <a href="#" class="leersms" id="{{ $item->idnotificacion }}">
                       <div class="pull-left">
-                        <img src="{{ URL::asset(Auth::user()->imagen) }}" class="img-circle" alt="User Image">
+                        <img src="{{ URL::asset($item->imagen) }}" class="img-circle" alt="User Image">
                       </div>
                       <h4>
-                        Support Team
+                        {{ str_limit($item->name.' '.$item->apellido,23) }}
                         <small><i class="fa fa-clock-o"></i> 5 mins</small>
                       </h4>
-                      <p>Why not buy a new awesome theme?</p>
+                      <p>{{ str_limit($item->asunto,25) }}</p>
                     </a>
-                  </li>
-                  <!-- end message -->
+                  </li><!-- end message -->
+                @endforeach
+                @endif
+
                 </ul>
               </li>
-              <li class="footer"><a href="#">See All Messages</a></li>
+              <li class="footer"><a href="{{ url('allsms') }}">Ver todos los mensajes</a></li>
             </ul>
           </li>
+          @endif
           <!-- Notifications: style can be found in dropdown.less -->
           <li class="dropdown notifications-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -237,16 +247,37 @@
             <span class="pull-right-container">              
             </span>
           </a>
-        </li>
-       
-        <li class="treeview active">
-          <a href="{{ url('/') }}">
-            <i class="fa fa-dashboard"></i> <span>DIRECTOR</span>
-            <span class="pull-right-container">              
+        </li>       
+
+        <li class="treeview">
+          <a href="mailbox.html">
+            <i class="fa fa-envelope"></i> <span>Mensajes</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+              <small class="label pull-right bg-yellow">12</small>
+              <small class="label pull-right bg-green">16</small>
+              <small class="label pull-right bg-red">5</small>
+
             </span>
           </a>
+          <ul class="treeview-menu" style="display: none;">
+            <li class="active">
+              <a href="{{ url('sendsmsDocente') }}">Enviar a docentes
+                <span class="pull-right-container">
+                  <span class="label label-primary pull-right">13</span>
+                </span>
+              </a>
+            </li>
+            <li class="active">
+              <a href="mailbox.html">Enviar a estudiantes
+                <span class="pull-right-container">
+                  <span class="label label-primary pull-right">13</span>
+                </span>
+              </a>
+            </li>
+            
+          </ul>
         </li>
-        
         @permission(array('rolesPermisos','createUser'))
         <li class="treeview active">
           <a href="#">
@@ -298,13 +329,13 @@
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
-      @section('content-header')
+      @section('content-header')    
       @show
     </section>
 
     <!-- Main content -->
     <section class="content">
-		@section('content')
+    @section('content')
     @show      
     </section>
     <!-- /.content -->
@@ -516,6 +547,7 @@
 </div>
 <!-- ./wrapper -->
 
+
 <!-- jQuery 2.2.3 -->
 <script src="{{ URL::asset('plugins/jQuery/jQuery-2.1.4.min.js') }}"></script>
 <script src="{{ URL::asset('js/jquery.multi-select.js') }}"></script>
@@ -532,6 +564,10 @@
 <script src="{{ URL::asset('js/app.min.js') }}"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="{{ URL::asset('js/demo.js') }}"></script>
+<!-- iCheck -->
+<script src="{{ URL::asset('plugins/iCheck/icheck.min.js') }}"></script>
+<!-- Bootstrap WYSIHTML5 -->
+<script src="{{ URL::asset('plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js') }}"></script>
 <!-- InputMask -->
 <script src="{{ URL::asset('plugins/input-mask/jquery.inputmask.js') }}"></script>
 <script src="{{ URL::asset('plugins/input-mask/jquery.inputmask.date.extensions.js') }}"></script>
@@ -548,7 +584,7 @@
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog ">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header" id="modalheader">
         <h4 class="modal-title" id="myModalLabel"></h4>
       </div>
     <div class="modal-body" id="modal-bodyku">
@@ -558,6 +594,23 @@
         </div>
     </div>
 </div>
+    <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog ">
+            <div class="modal-content">
+                <div class="modal-header">
+      
+                    
+                    <h4 class="modal-title" id="myModalLabel"></h4>
+                </div>
+            <div class="modal-body" id="modal-bodyku">
+
+            </div>
+            <div class="modal-footer" id="modal-footerq">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
+            </div>
+            </div>
+        </div>
+    </div>
 
 <script type="text/javascript">
   function registrar(title,content){
@@ -656,6 +709,25 @@
           });        
       </script>    
 @endif
-
+<script type="text/javascript">
+_modal1 = $('#myModal');
+$('.leersms').unbind().bind('click',function(e){
+            e.preventDefault();
+            id = $('.leersms').attr('id');             
+            $.ajax({
+                url: "{{ url('leersms') }}/"+id,                
+                success:function(response){
+                    _modal1.find('#modalheader').remove();
+                    _modal1.find('#modal-footerq').remove();
+                    _modal1.find('#modal-bodyku').removeAttr('class');
+                    _modal1.find('#modal-bodyku').html(response);
+                    _modal1.find('.btn-primary').unbind().bind('click',function(e){
+                        e.preventDefault();                        
+                    });
+                    _modal1.modal('show');     
+                }
+            });
+        });//EDN CREAR MATERIA
+</script>
 </body>
 </html>
